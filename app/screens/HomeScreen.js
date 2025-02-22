@@ -7,19 +7,25 @@ const produtos = [
     id: "1",
     nome: "Camiseta Branca",
     preco: "R$ 79,90",
-    imagem: "https://via.placeholder.com/150",
+    imagem: require("../../assets/images/Produtos/camisabranca.png"),
   },
   {
     id: "2",
     nome: "Jaqueta Jeans",
     preco: "R$ 199,90",
-    imagem: "https://via.placeholder.com/150",
+    imagem: require("../../assets/images/Produtos/jaquetaJeans.png"),
   },
   {
-    id: "3",
-    nome: "Tênis Esportivo",
-    preco: "R$ 299,90",
-    imagem: "https://via.placeholder.com/150",
+    id: "4",
+    nome: "Camiseta Preta",
+    preco: "R$ 89,90",
+    imagem: require("../../assets/images/Produtos/camisaP.webp"),
+  },
+  {
+    id: "5",
+    nome: "Calça Jeans",
+    preco: "R$ 159,90",
+    imagem: require("../../assets/images/Produtos/calçaJeans.webp"),
   },
 ];
 
@@ -55,13 +61,13 @@ const HomeScreen = () => {
 
   // Função para rolar até a seção de Novidades
   const scrollToNovidades = () => {
-    scrollViewRef.current.scrollTo({ y: 650, animated: true }); // Ajuste o valor de y conforme a altura da seção
+    scrollViewRef.current.scrollTo({ y: 350, animated: true }); // Ajuste o valor de y conforme a altura da seção
   };
 
   return (
     <View style={styles.container}>
       <Navbar onNovidadesPress={scrollToNovidades} /> {/* Passando a função para a Navbar */}
-      
+
       <ScrollView ref={scrollViewRef} contentContainerStyle={styles.scrollContainer}>
         {/* Banner rotativo */}
         <View style={styles.bannerContainer}>
@@ -76,13 +82,16 @@ const HomeScreen = () => {
           <Text style={styles.titulo}>Novidades</Text>
         </View>
 
+        {/* Lista de Produtos Horizontal */}
         <FlatList
           data={produtos}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ flexGrow: 1 }}
+          horizontal={true}  // Exibir os cards na horizontal
+          showsHorizontalScrollIndicator={false}  // Esconde a barra de rolagem
+          contentContainerStyle={styles.produtosContainer}
           renderItem={({ item }) => (
             <View style={styles.card}>
-              <Image source={{ uri: item.imagem }} style={styles.imagem} />
+              <Image source={item.imagem} style={styles.imagem} />  {/* Corrigido aqui */}
               <Text style={styles.nome}>{item.nome}</Text>
               <Text style={styles.preco}>{item.preco}</Text>
             </View>
@@ -96,11 +105,11 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#fff",
   },
   scrollContainer: {
-    paddingTop: 80, // Deixa espaço para a navbar fixa
-    padding: 16,
+    paddingTop: 5, // Deixa espaço para a navbar fixa
+    padding: 5,
   },
   titleContainer: {
     width: "100%",
@@ -112,32 +121,38 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
+  produtosContainer: {
+    paddingVertical: 50,
+  },
   card: {
-    backgroundColor: "#f9f9f9",
-    padding: 12,
-    marginBottom: 12,
+    backgroundColor: "#eeeeee",
+    padding: 15,
+    marginRight: 40, // margem entre os cards
     borderRadius: 8,
+    width: 200, // largura do card
     alignItems: "center",
   },
   imagem: {
-    width: 150,
-    height: 150,
+    width: "100%",
+    height: 180, // altura da imagem
     borderRadius: 8,
   },
   nome: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     marginTop: 8,
+    textAlign: "center",
   },
   preco: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#555",
     marginTop: 4,
+    textAlign: "center",
   },
   bannerContainer: {
     width: "100%",
     height: 600,
-    marginBottom: 16,
+    marginBottom: 50,
   },
   banner: {
     width: "100%",
