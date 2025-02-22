@@ -3,34 +3,32 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
-const Navbar = ({ onNovidadesPress }) => {
+const Navbar = ({ onNovidadesPress, onInformacoesPress }) => {
   const router = useRouter();
 
   return (
     <View style={styles.navbar}>
-      <View style={styles.logo}>
-        {/* Logo */}
-        <Image
-          source={require("../../assets/images/SmoothB.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </View>
+      {/* Logo */}
+      <Image
+        source={require("../../assets/images/SmoothB.png")}
+        style={styles.logo}
+        resizeMode="contain"
+      />
 
       {/* Botão Home */}
-      <TouchableOpacity style={styles.navItem} onPress={() => router.push("/")}>
+      <TouchableOpacity style={styles.navItem} onPress={() => router.replace("/")}>
         <Ionicons name="home-outline" size={24} color="black" />
         <Text style={styles.text}>Home</Text>
       </TouchableOpacity>
 
-      {/* Botão Novidades com rolagem */}
+      {/* Botão Novidades */}
       <TouchableOpacity style={styles.navItem} onPress={onNovidadesPress}>
         <Ionicons name="megaphone-outline" size={24} color="black" />
         <Text style={styles.text}>Novidades</Text>
       </TouchableOpacity>
 
       {/* Botão Informações */}
-      <TouchableOpacity style={styles.navItem} onPress={() => router.push("/Information")}>
+      <TouchableOpacity style={styles.navItem} onPress={onInformacoesPress}>
         <Ionicons name="information-circle-outline" size={24} color="black" />
         <Text style={styles.text}>Informações</Text>
       </TouchableOpacity>
@@ -47,12 +45,12 @@ const Navbar = ({ onNovidadesPress }) => {
 const styles = StyleSheet.create({
   navbar: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    justifyContent: "space-between",
     paddingVertical: 10,
     backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: "#fff",
+    borderBottomColor: "#ddd", // Ajustado para melhor visibilidade
     paddingHorizontal: 16,
   },
   navItem: {

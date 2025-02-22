@@ -1,82 +1,68 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, FlatList, Image, StyleSheet, ScrollView, Animated, TouchableOpacity } from "react-native";
+import { View, Text, FlatList, Image, StyleSheet, ScrollView, Animated } from "react-native";
 import Navbar from "./Navbar"; // Importando a Navbar
 
 const produtos = [
-  {
-    id: "1",
-    nome: "Camiseta Branca",
-    preco: "R$ 79,90",
-    imagem: require("../../assets/images/Produtos/camisabranca.png"),
-  },
-  {
-    id: "2",
-    nome: "Jaqueta Jeans",
-    preco: "R$ 199,90",
-    imagem: require("../../assets/images/Produtos/jaquetaJeans.png"),
-  },
-  {
-    id: "4",
-    nome: "Camiseta Preta",
-    preco: "R$ 89,90",
-    imagem: require("../../assets/images/Produtos/camisaP.webp"),
-  },
-  {
-    id: "5",
-    nome: "Calça Jeans",
-    preco: "R$ 159,90",
-    imagem: require("../../assets/images/Produtos/calçaJeans.webp"),
-  },
+  { id: "1", nome: "Camiseta Branca", preco: "R$ 79,90", imagem: require("../../assets/images/Produtos/camisabranca.png") },
+  { id: "2", nome: "Jaqueta Jeans", preco: "R$ 199,90", imagem: require("../../assets/images/Produtos/jaquetaJeans.png") },
+  { id: "4", nome: "Camiseta Preta", preco: "R$ 89,90", imagem: require("../../assets/images/Produtos/camisaP.webp") },
+  { id: "5", nome: "Calça Jeans", preco: "R$ 159,90", imagem: require("../../assets/images/Produtos/calçaJeans.webp") },
+  { id: "6", nome: "Terno Slim Azul", preco: "R$ 459,90", imagem: require("../../assets/images/Produtos/Ternoazul.png") },
+  { id: "7", nome: "Calça Cinza", preco: "R$ 156,90", imagem: require("../../assets/images/Produtos/calcaCinza.png") },
+  { id: "8", nome: "Bota Harness", preco: "R$ 898,90", imagem: require("../../assets/images/Produtos/harness.jpg") },
+  { id: "9", nome: "Sobretudo Masculino", preco: "R$ 458,90", imagem: require("../../assets/images/Produtos/sobretudo.jpg") },
 ];
 
 const banners = [
-  require("../../assets/images/BlackBanner1.png"),  // Imagem local 1
-  require("../../assets/images/BlackBanner2.png"),  // Imagem local 2
+  require("../../assets/images/BlackBanner1.png"),
+  require("../../assets/images/BlackBanner2.png"),
 ];
 
 const HomeScreen = () => {
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
-  const fadeAnim = useState(new Animated.Value(1))[0]; // Inicializa com fadeAnim 1 (totalmente visível)
-  const scrollViewRef = useRef(null); // Referência para o ScrollView
-  const sobreRef = useRef(null); // Referência para a seção "Sobre a Empresa"
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const scrollViewRef = useRef(null);
+  const sobrePos = useRef(0);
+  const novidadesPos = useRef(0);
 
-  // Altera a imagem do banner a cada 10 segundos com animação de fade
+  // Altera o banner com fade a cada 10s
   useEffect(() => {
     const interval = setInterval(() => {
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 500, // duração do fadeOut (500ms)
-        useNativeDriver: true,
-      }).start(() => {
+      Animated.timing(fadeAnim, { toValue: 0, duration: 500, useNativeDriver: true }).start(() => {
         setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % banners.length);
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 500, // duração do fadeIn (500ms)
-          useNativeDriver: true,
-        }).start();
+        Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }).start();
       });
     }, 10000);
-
-    return () => clearInterval(interval); // Limpa o intervalo quando o componente for desmontado
+    return () => clearInterval(interval);
   }, [fadeAnim]);
 
-  // Função para rolar até a seção "Sobre a Empresa"
+  // Função para rolar até "Sobre a Empresa"
   const scrollToSobre = () => {
-    sobreRef.current?.scrollIntoView({ behavior: "smooth" }); // Rola para a seção "Sobre a Empresa"
+    scrollViewRef.current?.scrollTo({ y: sobrePos.current, animated: true });
   };
+
+  // Função para rolar até "Novidades"
+  const scrollToNovidades = () => {
+    scrollViewRef.current?.scrollTo({ y: novidadesPos.current, animated: true });
+  };
+
+  // Função otimizada para renderizar os produtos
+  const renderProduto = ({ item }) => (
+    <View style={styles.card}>
+      <Image source={item.imagem} style={styles.imagem} />
+      <Text style={styles.nome}>{item.nome}</Text>
+      <Text style={styles.preco}>{item.preco}</Text>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-      <Navbar onNovidadesPress={scrollToSobre} /> {/* Passando a função para a Navbar */}
+      <Navbar onNovidadesPress={scrollToNovidades} onInformacoesPress={scrollToSobre} />
 
       <ScrollView ref={scrollViewRef} contentContainerStyle={styles.scrollContainer}>
         {/* Banner rotativo */}
         <View style={styles.bannerContainer}>
-          <Animated.Image
-            source={banners[currentBannerIndex]}
-            style={[styles.banner, { opacity: fadeAnim }]}
-            resizeMode="cover"
-          />
+          <Animated.Image source={banners[currentBannerIndex]} style={[styles.banner, { opacity: fadeAnim }]} resizeMode="cover" />
         </View>
 
         <View style={styles.titleContainer}>
@@ -87,16 +73,11 @@ const HomeScreen = () => {
         <FlatList
           data={produtos}
           keyExtractor={(item) => item.id}
-          horizontal={true}  // Exibir os cards na horizontal
-          showsHorizontalScrollIndicator={false}  // Esconde a barra de rolagem
+          horizontal
+          showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.produtosContainer}
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Image source={item.imagem} style={styles.imagem} />
-              <Text style={styles.nome}>{item.nome}</Text>
-              <Text style={styles.preco}>{item.preco}</Text>
-            </View>
-          )}
+          renderItem={renderProduto}
+          onLayout={(event) => { novidadesPos.current = event.nativeEvent.layout.y; }}
         />
 
         <View style={styles.titleContainer}>
@@ -104,19 +85,16 @@ const HomeScreen = () => {
         </View>
 
         {/* Seção Sobre a Empresa */}
-        <View ref={sobreRef} style={styles.sobreContainer}>
+        <View 
+          onLayout={(event) => { sobrePos.current = event.nativeEvent.layout.y; }} 
+          style={styles.sobreContainer}
+        >
           <View style={styles.sobreCard}>
-            <Image
-              source={require("../../assets/images/sobreimg.jpg")} // Substitua com a imagem da empresa
-              style={styles.sobreImagem}
-              resizeMode="cover"
-            />
+            <Image source={require("../../assets/images/sobreimg.jpg")} style={styles.sobreImagem} resizeMode="cover" />
             <View style={styles.sobreTexto}>
               <Text style={styles.sobreDescricao}>
-                Somos uma marca de moda masculina formal, focada em oferecer peças
-                sofisticadas e elegantes para homens que buscam estilo e conforto.
-                Nosso objetivo é criar roupas que atendem às necessidades do homem moderno,
-                com qualidade e design inovador.
+                Somos uma marca de moda masculina formal, focada em oferecer peças sofisticadas e elegantes para homens que buscam estilo e conforto.
+                Nosso objetivo é criar roupas que atendam às necessidades do homem moderno, com qualidade e design inovador.
               </Text>
             </View>
           </View>
@@ -127,13 +105,14 @@ const HomeScreen = () => {
   );
 };
 
+// Estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
   },
   scrollContainer: {
-    paddingTop: 5, // Deixa espaço para a navbar fixa
+    paddingTop: 5,
     padding: 5,
   },
   titleContainer: {
@@ -152,14 +131,14 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#eeeeee",
     padding: 15,
-    marginRight: 40, // margem entre os cards
+    marginRight: 40,
     borderRadius: 8,
-    width: 200, // largura do card
+    width: 200,
     alignItems: "center",
   },
   imagem: {
     width: "100%",
-    height: 180, // altura da imagem
+    height: 180,
     borderRadius: 8,
   },
   nome: {
@@ -193,22 +172,22 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   sobreCard: {
-    backgroundColor: "#eeeeee", // Fundo da área de sobre a empresa
-    width: "100%", // Ocupa 100% da largura
-    height: "100%", // Garante que a altura seja ocupada igualmente
+    backgroundColor: "#eeeeee",
+    width: "100%",
+    height: "100%",
     borderRadius: 8,
     padding: 20,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between", // Garantir que imagem e texto ocupem o mesmo espaço
+    justifyContent: "space-between",
   },
   sobreImagem: {
-    width: "48%", // Ajuste para ocupar 48% da largura
-    height: "100%", // Ocupa 100% da altura disponível
+    width: "48%",
+    height: "100%",
     borderRadius: 8,
   },
   sobreTexto: {
-    width: "48%", // Ocupa 48% da largura
+    width: "48%",
     justifyContent: "center",
     paddingHorizontal: 20,
   },
