@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, FlatList, Image, StyleSheet, ScrollView, Animated } from "react-native";
+import { View, Text, FlatList, Image, StyleSheet, ScrollView, Animated, TouchableOpacity } from "react-native";
 import Navbar from "./Navbar"; // Importando a Navbar
 
 const produtos = [
@@ -38,6 +38,7 @@ const HomeScreen = () => {
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const fadeAnim = useState(new Animated.Value(1))[0]; // Inicializa com fadeAnim 1 (totalmente visível)
   const scrollViewRef = useRef(null); // Referência para o ScrollView
+  const sobreRef = useRef(null); // Referência para a seção "Sobre a Empresa"
 
   // Altera a imagem do banner a cada 10 segundos com animação de fade
   useEffect(() => {
@@ -59,14 +60,14 @@ const HomeScreen = () => {
     return () => clearInterval(interval); // Limpa o intervalo quando o componente for desmontado
   }, [fadeAnim]);
 
-  // Função para rolar até a seção de Novidades
-  const scrollToNovidades = () => {
-    scrollViewRef.current.scrollTo({ y: 350, animated: true }); // Ajuste o valor de y conforme a altura da seção
+  // Função para rolar até a seção "Sobre a Empresa"
+  const scrollToSobre = () => {
+    sobreRef.current?.scrollIntoView({ behavior: "smooth" }); // Rola para a seção "Sobre a Empresa"
   };
 
   return (
     <View style={styles.container}>
-      <Navbar onNovidadesPress={scrollToNovidades} /> {/* Passando a função para a Navbar */}
+      <Navbar onNovidadesPress={scrollToSobre} /> {/* Passando a função para a Navbar */}
 
       <ScrollView ref={scrollViewRef} contentContainerStyle={styles.scrollContainer}>
         {/* Banner rotativo */}
@@ -91,12 +92,36 @@ const HomeScreen = () => {
           contentContainerStyle={styles.produtosContainer}
           renderItem={({ item }) => (
             <View style={styles.card}>
-              <Image source={item.imagem} style={styles.imagem} />  {/* Corrigido aqui */}
+              <Image source={item.imagem} style={styles.imagem} />
               <Text style={styles.nome}>{item.nome}</Text>
               <Text style={styles.preco}>{item.preco}</Text>
             </View>
           )}
         />
+
+        <View style={styles.titleContainer}>
+          <Text style={styles.titulo}>Sobre a empresa</Text>
+        </View>
+
+        {/* Seção Sobre a Empresa */}
+        <View ref={sobreRef} style={styles.sobreContainer}>
+          <View style={styles.sobreCard}>
+            <Image
+              source={require("../../assets/images/sobreimg.jpg")} // Substitua com a imagem da empresa
+              style={styles.sobreImagem}
+              resizeMode="cover"
+            />
+            <View style={styles.sobreTexto}>
+              <Text style={styles.sobreDescricao}>
+                Somos uma marca de moda masculina formal, focada em oferecer peças
+                sofisticadas e elegantes para homens que buscam estilo e conforto.
+                Nosso objetivo é criar roupas que atendem às necessidades do homem moderno,
+                com qualidade e design inovador.
+              </Text>
+            </View>
+          </View>
+        </View>
+
       </ScrollView>
     </View>
   );
@@ -158,6 +183,39 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     borderRadius: 4,
+  },
+  sobreContainer: {
+    width: "100%",
+    height: 500,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    marginTop: 50,
+  },
+  sobreCard: {
+    backgroundColor: "#eeeeee", // Fundo da área de sobre a empresa
+    width: "100%", // Ocupa 100% da largura
+    height: "100%", // Garante que a altura seja ocupada igualmente
+    borderRadius: 8,
+    padding: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between", // Garantir que imagem e texto ocupem o mesmo espaço
+  },
+  sobreImagem: {
+    width: "48%", // Ajuste para ocupar 48% da largura
+    height: "100%", // Ocupa 100% da altura disponível
+    borderRadius: 8,
+  },
+  sobreTexto: {
+    width: "48%", // Ocupa 48% da largura
+    justifyContent: "center",
+    paddingHorizontal: 20,
+  },
+  sobreDescricao: {
+    fontSize: 16,
+    color: "#555",
+    lineHeight: 24,
   },
 });
 
