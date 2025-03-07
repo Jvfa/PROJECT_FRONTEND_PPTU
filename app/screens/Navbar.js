@@ -10,7 +10,7 @@ const Navbar = ({ onNovidadesPress, onInformacoesPress }) => {
     <View style={styles.navbar}>
       {/* Logo */}
       <Image
-        source={require("../../assets/images/SmoothB.png")}
+        source={require("../../assets/images/icon-removebg-preview.png")}
         style={styles.logo}
         resizeMode="contain"
       />
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: 120,
-    height: 50,
+    height: 80,
   },
   text: {
     fontSize: 12,

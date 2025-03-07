@@ -14,47 +14,47 @@ const LoginScreen = () => {
   const [senha, setSenha] = useState("");
   const [lembrar, setLembrar] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
-  // Função para validar o e-mail
-  const validarEmail = (email) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
-
-  // Função para validar a senha
-  const validarSenha = (senha) => {
-    const regex = /^(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    return regex.test(senha);
-  };
+  const validarEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validarSenha = (senha) =>
+    /^(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(senha);
 
   const handleLogin = () => {
-    // Se o campo estiver vazio
     if (!email || !senha) {
       setErrorMessage("Preencha todos os campos.");
-      setEmail("");
-      setSenha("");
+      setSuccessMessage("");
       return;
     }
 
-    // Se o e-mail for inválido
     if (!validarEmail(email)) {
       setErrorMessage("E-mail inválido.");
+      setSuccessMessage("");
       setEmail("");
       return;
     }
 
-    // Se a senha for inválida
     if (!validarSenha(senha)) {
       setErrorMessage(
-        "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula e um caractere especial."
+        "Senha inválida."
       );
+      setSuccessMessage("");
       setSenha("");
       return;
     }
 
-    // Se tudo estiver certo, limpar mensagens de erro e processar login
+    // Login bem-sucedido
     setErrorMessage("");
-    console.log("Login realizado com sucesso!");
+    setSuccessMessage("Login realizado com sucesso!");
+
+    // Limpa os campos
+    setEmail("");
+    setSenha("");
+
+    // Remove a mensagem de sucesso após 2 segundos
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 2000);
   };
 
   return (
@@ -65,10 +65,9 @@ const LoginScreen = () => {
       <View style={styles.card}>
         <Text style={styles.title}>Acesse o sistema</Text>
 
-        {/* Mensagem de erro */}
         {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+        {successMessage ? <Text style={styles.successText}>{successMessage}</Text> : null}
 
-        {/* Campo de E-mail */}
         <View style={styles.inputContainer}>
           <Ionicons name="mail-outline" size={20} color="#555" />
           <TextInput
@@ -81,7 +80,6 @@ const LoginScreen = () => {
           />
         </View>
 
-        {/* Campo de Senha */}
         <View style={styles.inputContainer}>
           <Ionicons name="lock-closed-outline" size={20} color="#555" />
           <TextInput
@@ -94,7 +92,6 @@ const LoginScreen = () => {
           />
         </View>
 
-        {/* Lembrar de mim & Esqueci a senha */}
         <View style={styles.row}>
           <TouchableOpacity onPress={() => setLembrar(!lembrar)}>
             <Text style={[styles.text, lembrar && styles.textBold]}>
@@ -106,15 +103,12 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Botão de Login */}
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
 
-        {/* Link para Registro */}
         <Text style={styles.registerText}>
-          Não tem uma conta?{" "}
-          <Text style={styles.registerLink}>Registrar</Text>
+          Não tem uma conta? <Text style={styles.registerLink}>Registrar</Text>
         </Text>
       </View>
     </ImageBackground>
@@ -126,7 +120,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#eeeeee",
   },
   card: {
     width: "80%",
@@ -148,6 +141,12 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: "red",
+    fontSize: 14,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  successText: {
+    color: "green",
     fontSize: 14,
     marginBottom: 10,
     textAlign: "center",
