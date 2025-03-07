@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   ImageBackground,
-  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -14,6 +13,7 @@ const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [lembrar, setLembrar] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Função para validar o e-mail
   const validarEmail = (email) => {
@@ -28,36 +28,45 @@ const LoginScreen = () => {
   };
 
   const handleLogin = () => {
-    console.log("Tentando login com:", email, senha);
-
+    // Se o campo estiver vazio
     if (!email || !senha) {
-      Alert.alert("Erro", "Por favor, preencha todos os campos.");
+      setErrorMessage("Preencha todos os campos.");
+      setEmail("");
+      setSenha("");
       return;
     }
 
+    // Se o e-mail for inválido
     if (!validarEmail(email)) {
-      Alert.alert("Erro", "E-mail inválido. Verifique e tente novamente.");
+      setErrorMessage("E-mail inválido.");
+      setEmail("");
       return;
     }
 
+    // Se a senha for inválida
     if (!validarSenha(senha)) {
-      Alert.alert(
-        "Erro",
+      setErrorMessage(
         "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula e um caractere especial."
       );
+      setSenha("");
       return;
     }
 
-    Alert.alert("Sucesso", "Login realizado com sucesso!");
+    // Se tudo estiver certo, limpar mensagens de erro e processar login
+    setErrorMessage("");
+    console.log("Login realizado com sucesso!");
   };
 
   return (
     <ImageBackground
-      source={{ uri: "https://via.placeholder.com/800x600" }} // Substitua por sua imagem de fundo
+      source={{ uri: "https://via.placeholder.com/800x600" }}
       style={styles.background}
     >
       <View style={styles.card}>
         <Text style={styles.title}>Acesse o sistema</Text>
+
+        {/* Mensagem de erro */}
+        {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
         {/* Campo de E-mail */}
         <View style={styles.inputContainer}>
@@ -117,11 +126,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#eeeeee",
   },
   card: {
-    width: "80%", // Melhor para dispositivos menores
+    width: "80%",
     maxWidth: 400,
-    backgroundColor: "rgba(255, 255, 255, 0.2)", // Efeito vidro
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
     padding: 20,
     borderRadius: 12,
     alignItems: "center",
@@ -133,8 +143,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 20,
-    color: "#000", // Alterado para preto
+    marginBottom: 10,
+    color: "#000",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 14,
+    marginBottom: 10,
+    textAlign: "center",
   },
   inputContainer: {
     flexDirection: "row",
