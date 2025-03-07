@@ -15,21 +15,31 @@ const LoginScreen = () => {
   const [senha, setSenha] = useState("");
   const [lembrar, setLembrar] = useState(false);
 
+  // Função para validar o e-mail
   const validarEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   };
 
+  // Função para validar a senha
   const validarSenha = (senha) => {
     const regex = /^(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     return regex.test(senha);
   };
 
   const handleLogin = () => {
-    if (!validarEmail(email)) {
-      Alert.alert("Erro", "E-mail inválido");
+    console.log("Tentando login com:", email, senha);
+
+    if (!email || !senha) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos.");
       return;
     }
+
+    if (!validarEmail(email)) {
+      Alert.alert("Erro", "E-mail inválido. Verifique e tente novamente.");
+      return;
+    }
+
     if (!validarSenha(senha)) {
       Alert.alert(
         "Erro",
@@ -37,6 +47,7 @@ const LoginScreen = () => {
       );
       return;
     }
+
     Alert.alert("Sucesso", "Login realizado com sucesso!");
   };
 
@@ -55,8 +66,9 @@ const LoginScreen = () => {
             style={styles.input}
             placeholder="E-mail"
             keyboardType="email-address"
+            autoCapitalize="none"
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(text) => setEmail(text.trim())}
           />
         </View>
 
@@ -67,8 +79,9 @@ const LoginScreen = () => {
             style={styles.input}
             placeholder="Senha"
             secureTextEntry
+            autoCapitalize="none"
             value={senha}
-            onChangeText={setSenha}
+            onChangeText={(text) => setSenha(text)}
           />
         </View>
 
@@ -106,7 +119,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   card: {
-    width: "85%",
+    width: "80%", // Melhor para dispositivos menores
+    maxWidth: 400,
     backgroundColor: "rgba(255, 255, 255, 0.2)", // Efeito vidro
     padding: 20,
     borderRadius: 12,
@@ -115,13 +129,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    backdropFilter: "blur(10px)", // Suaviza o fundo
   },
   title: {
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#fff",
+    color: "#000", // Alterado para preto
   },
   inputContainer: {
     flexDirection: "row",
@@ -145,7 +158,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 14,
-    color: "#fff",
+    color: "#000",
   },
   textBold: {
     fontWeight: "bold",
@@ -165,7 +178,7 @@ const styles = StyleSheet.create({
   },
   registerText: {
     fontSize: 14,
-    color: "#fff",
+    color: "#000",
   },
   registerLink: {
     fontWeight: "bold",
