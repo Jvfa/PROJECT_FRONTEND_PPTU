@@ -18,12 +18,31 @@ const LoginScreen = () => {
   const [isPressed, setIsPressed] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  const validarEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validarSenha = (senha) =>
+    /^(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(senha);
+
   const handleLogin = () => {
     if (!email || !senha) {
       setErrorMessage("Preencha todos os campos.");
       setSuccessMessage("");
       return;
     }
+
+    if (!validarEmail(email)) {
+      setErrorMessage("E-mail inválido.");
+      setSuccessMessage("");
+      setEmail("");
+      return;
+    }
+
+    if (!validarSenha(senha)) {
+      setErrorMessage("Senha inválida.");
+      setSuccessMessage("");
+      setSenha("");
+      return;
+    }
+
     setErrorMessage("");
     setSuccessMessage("Login realizado com sucesso!");
     setEmail("");
