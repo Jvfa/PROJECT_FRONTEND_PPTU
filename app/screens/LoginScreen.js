@@ -16,10 +16,7 @@ const LoginScreen = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isPressed, setIsPressed] = useState(false);
-
-  const validarEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const validarSenha = (senha) =>
-    /^(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(senha);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleLogin = () => {
     if (!email || !senha) {
@@ -27,27 +24,10 @@ const LoginScreen = () => {
       setSuccessMessage("");
       return;
     }
-
-    if (!validarEmail(email)) {
-      setErrorMessage("E-mail inválido.");
-      setSuccessMessage("");
-      setEmail("");
-      return;
-    }
-
-    if (!validarSenha(senha)) {
-      setErrorMessage("Senha inválida.");
-      setSuccessMessage("");
-      setSenha("");
-      return;
-    }
-
     setErrorMessage("");
     setSuccessMessage("Login realizado com sucesso!");
-
     setEmail("");
     setSenha("");
-
     setTimeout(() => {
       setSuccessMessage("");
     }, 2000);
@@ -55,7 +35,7 @@ const LoginScreen = () => {
 
   return (
     <LinearGradient
-      colors={["white", "gray"]}
+      colors={["white", "#bfbfbf"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.background}
@@ -105,9 +85,17 @@ const LoginScreen = () => {
           onPress={handleLogin}
           onPressIn={() => setIsPressed(true)}
           onPressOut={() => setIsPressed(false)}
+          onHoverIn={() => setIsHovered(true)}
+          onHoverOut={() => setIsHovered(false)}
           style={({ pressed }) => [
             styles.button,
-            { backgroundColor: pressed || isPressed ? "#555" : "#fff" },
+            {
+              backgroundColor: pressed
+                ? "#707070" // Cinza escuro quando pressionado
+                : isHovered
+                ? "#909090" // Cinza médio ao passar o mouse por cima (somente no Web)
+                : "#fff", // Cinza claro padrão
+            },
           ]}
         >
           <Text style={styles.buttonText}>Entrar</Text>
@@ -130,19 +118,19 @@ const styles = StyleSheet.create({
   card: {
     width: "80%",
     maxWidth: 400,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: "rgba(254, 254, 255, 0)",
     padding: 20,
     borderRadius: 12,
     alignItems: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
     shadowRadius: 5,
   },
   title: {
     fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 20,
     color: "#000",
   },
   errorText: {
@@ -198,7 +186,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: "#000",
   },
   registerText: {
     fontSize: 14,
