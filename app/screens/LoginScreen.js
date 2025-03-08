@@ -3,11 +3,11 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   StyleSheet,
-  ImageBackground,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +15,7 @@ const LoginScreen = () => {
   const [lembrar, setLembrar] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [isPressed, setIsPressed] = useState(false);
 
   const validarEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validarSenha = (senha) =>
@@ -35,35 +36,32 @@ const LoginScreen = () => {
     }
 
     if (!validarSenha(senha)) {
-      setErrorMessage(
-        "Senha inválida."
-      );
+      setErrorMessage("Senha inválida.");
       setSuccessMessage("");
       setSenha("");
       return;
     }
 
-    // Login bem-sucedido
     setErrorMessage("");
     setSuccessMessage("Login realizado com sucesso!");
 
-    // Limpa os campos
     setEmail("");
     setSenha("");
 
-    // Remove a mensagem de sucesso após 2 segundos
     setTimeout(() => {
       setSuccessMessage("");
     }, 2000);
   };
 
   return (
-    <ImageBackground
-      source={{ uri: "https://via.placeholder.com/800x600" }}
+    <LinearGradient
+      colors={["white", "gray"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
       style={styles.background}
     >
       <View style={styles.card}>
-        <Text style={styles.title}>Acesse o sistema</Text>
+        <Text style={styles.title}>Login</Text>
 
         {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
         {successMessage ? <Text style={styles.successText}>{successMessage}</Text> : null}
@@ -93,25 +91,33 @@ const LoginScreen = () => {
         </View>
 
         <View style={styles.row}>
-          <TouchableOpacity onPress={() => setLembrar(!lembrar)}>
+          <Pressable onPress={() => setLembrar(!lembrar)}>
             <Text style={[styles.text, lembrar && styles.textBold]}>
               {lembrar ? "☑ Lembre de mim" : "☐ Lembre de mim"}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
+          </Pressable>
+          <Pressable>
             <Text style={styles.text}>Esqueceu a senha?</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Pressable
+          onPress={handleLogin}
+          onPressIn={() => setIsPressed(true)}
+          onPressOut={() => setIsPressed(false)}
+          style={({ pressed }) => [
+            styles.button,
+            { backgroundColor: pressed || isPressed ? "#555" : "#fff" },
+          ]}
+        >
           <Text style={styles.buttonText}>Entrar</Text>
-        </TouchableOpacity>
+        </Pressable>
 
         <Text style={styles.registerText}>
           Não tem uma conta? <Text style={styles.registerLink}>Registrar</Text>
         </Text>
       </View>
-    </ImageBackground>
+    </LinearGradient>
   );
 };
 
@@ -130,8 +136,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
   },
   title: {
     fontSize: 22,
@@ -179,12 +185,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   button: {
-    backgroundColor: "#fff",
     width: "100%",
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
     marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   buttonText: {
     fontSize: 16,
