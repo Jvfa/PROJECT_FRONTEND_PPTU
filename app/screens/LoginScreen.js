@@ -5,6 +5,7 @@ import {
   TextInput,
   Pressable,
   StyleSheet,
+  Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -32,7 +33,6 @@ const LoginScreen = () => {
     if (!validarEmail(email)) {
       setErrorMessage("E-mail inválido.");
       setSuccessMessage("");
-      setEmail("");
       return;
     }
 
@@ -50,6 +50,11 @@ const LoginScreen = () => {
     setTimeout(() => {
       setSuccessMessage("");
     }, 2000);
+  };
+
+  const handleSubmit = () => {
+    handleLogin();
+    Keyboard.dismiss(); // Fechar o teclado após submeter
   };
 
   return (
@@ -74,6 +79,8 @@ const LoginScreen = () => {
             autoCapitalize="none"
             value={email}
             onChangeText={(text) => setEmail(text.trim())}
+            onSubmitEditing={handleSubmit} // Envia o formulário ao pressionar Enter
+            returnKeyType="next" // Move para o próximo campo quando pressionar Enter
           />
         </View>
 
@@ -86,6 +93,8 @@ const LoginScreen = () => {
             autoCapitalize="none"
             value={senha}
             onChangeText={(text) => setSenha(text)}
+            onSubmitEditing={handleSubmit} // Envia o formulário ao pressionar Enter
+            returnKeyType="done" // Submete o formulário ao pressionar Enter
           />
         </View>
 
@@ -101,7 +110,7 @@ const LoginScreen = () => {
         </View>
 
         <Pressable
-          onPress={handleLogin}
+          onPress={handleSubmit}
           onPressIn={() => setIsPressed(true)}
           onPressOut={() => setIsPressed(false)}
           onHoverIn={() => setIsHovered(true)}
