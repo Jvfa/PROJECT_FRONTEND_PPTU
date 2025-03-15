@@ -9,8 +9,11 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 
 const LoginScreen = () => {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [lembrar, setLembrar] = useState(false);
@@ -130,7 +133,7 @@ const LoginScreen = () => {
         </Pressable>
 
         <Text style={styles.registerText}>
-          Não tem uma conta? <Text style={styles.registerLink}>Registrar</Text>
+          Não tem uma conta? <Text style={styles.registerLink} onPress={() => router.push("/register")}>Registrar</Text>
         </Text>
       </View>
     </LinearGradient>
