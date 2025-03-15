@@ -9,18 +9,20 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router"; // Importa o hook useRouter
+import { useRouter } from "expo-router";
+import CheckBox from "expo-checkbox"; // Importando o checkbox
 
 const RegisterScreen = () => {
-  const router = useRouter(); // Usando o hook useRouter
+  const router = useRouter();
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [cep, setCep] = useState("");
   const [endereco, setEndereco] = useState("");
   const [cpf, setCpf] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false); // Estado para o checkbox
   const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState(""); // Estado para mensagem de sucesso
+  const [successMessage, setSuccessMessage] = useState("");
 
   const validarEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validarSenha = (senha) =>
@@ -68,13 +70,14 @@ const RegisterScreen = () => {
     if (!cep) newErrors.cep = "CEP é obrigatório.";
     else if (!validarCep(cep)) newErrors.cep = "CEP inválido.";
     if (!endereco) newErrors.endereco = "Endereço é obrigatório.";
+    if (!acceptTerms) newErrors.acceptTerms = "Você deve aceitar os termos e condições.";
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      setSuccessMessage("Cadastro realizado com sucesso!"); // Exibe mensagem de sucesso
+      setSuccessMessage("Cadastro realizado com sucesso!");
       setTimeout(() => {
-        router.push("/login"); // Redireciona para a tela de login após 2 segundos
+        router.push("/login");
       }, 2000);
     }
   };
@@ -86,36 +89,19 @@ const RegisterScreen = () => {
 
         <View style={styles.inputContainer}>
           <Ionicons name="person-outline" size={20} color="#555" />
-          <TextInput
-            style={styles.input}
-            placeholder="Nome Completo"
-            value={nome}
-            onChangeText={setNome}
-          />
+          <TextInput style={styles.input} placeholder="Nome Completo" value={nome} onChangeText={setNome} />
         </View>
         {errors.nome && <Text style={styles.errorText}>{errors.nome}</Text>}
 
         <View style={styles.inputContainer}>
           <Ionicons name="mail-outline" size={20} color="#555" />
-          <TextInput
-            style={styles.input}
-            placeholder="E-mail"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-          />
+          <TextInput style={styles.input} placeholder="E-mail" keyboardType="email-address" value={email} onChangeText={setEmail} />
         </View>
         {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
         <View style={styles.inputContainer}>
           <Ionicons name="lock-closed-outline" size={20} color="#555" />
-          <TextInput
-            style={styles.input}
-            placeholder="Senha"
-            secureTextEntry
-            value={senha}
-            onChangeText={setSenha}
-          />
+          <TextInput style={styles.input} placeholder="Senha" secureTextEntry value={senha} onChangeText={setSenha} />
         </View>
         {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
 
@@ -138,37 +124,36 @@ const RegisterScreen = () => {
 
         <View style={styles.inputContainer}>
           <Ionicons name="home-outline" size={20} color="#555" />
-          <TextInput
-            style={styles.input}
-            placeholder="Endereço"
-            value={endereco}
-            onChangeText={setEndereco}
-            editable={false}
-          />
+          <TextInput style={styles.input} placeholder="Endereço" value={endereco} onChangeText={setEndereco} editable={false} />
         </View>
         {errors.endereco && <Text style={styles.errorText}>{errors.endereco}</Text>}
 
         <View style={styles.inputContainer}>
           <Ionicons name="card-outline" size={20} color="#555" />
-          <TextInput
-            style={styles.input}
-            placeholder="CPF"
-            keyboardType="numeric"
-            value={cpf}
-            onChangeText={(text) => setCpf(formatarCpf(text))}
-            maxLength={14}
-          />
+          <TextInput style={styles.input} placeholder="CPF" keyboardType="numeric" value={cpf} onChangeText={(text) => setCpf(formatarCpf(text))} maxLength={14} />
         </View>
         {errors.cpf && <Text style={styles.errorText}>{errors.cpf}</Text>}
 
-        <Pressable onPress={handleRegister} style={({ pressed }) => [
-          styles.button,
-          pressed ? styles.buttonPressed : null
-        ]}>
+        {/* CheckBox para LGPD */}
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            value={acceptTerms}
+            onValueChange={setAcceptTerms}
+            color={acceptTerms ? "#000" : undefined}
+          />
+          <Text
+            style={styles.checkboxText}
+            onPress={() => setAcceptTerms(!acceptTerms)} // Permite marcar/desmarcar ao tocar no texto
+          >
+            Eu aceito os <Text style={styles.linkText}>termos e condições</Text>, <Text style={styles.linkText}>política de privacidade</Text>.
+          </Text>
+        </View>
+        {errors.acceptTerms && <Text style={styles.errorText}>{errors.acceptTerms}</Text>}
+
+        <Pressable onPress={handleRegister} style={({ pressed }) => [styles.button, pressed ? styles.buttonPressed : null]}>
           <Text style={styles.buttonText}>Cadastrar</Text>
         </Pressable>
 
-        {/* Mensagem de sucesso */}
         {successMessage && <Text style={styles.successMessage}>{successMessage}</Text>}
       </View>
     </LinearGradient>
@@ -241,6 +226,22 @@ const styles = StyleSheet.create({
     color: "green",
     fontSize: 14,
     fontWeight: "bold",
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  checkboxText: {
+    marginLeft: 10,
+    fontSize: 14,
+    color: "#000",
+  },
+  linkText: {
+    textDecorationLine: "underline", // Adiciona sublinhado
+    color: "#000", // Mantém a cor pretar
+    cursor: "pointer", // Simula um link clicável
   },
 });
 
