@@ -51,6 +51,7 @@ const LoginScreen = () => {
     setEmail("");
     setSenha("");
     setTimeout(() => {
+      router.push("/dashboard");
       setSuccessMessage("");
     }, 2000);
   };
