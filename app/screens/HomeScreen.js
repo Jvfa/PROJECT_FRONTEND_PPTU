@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, FlatList, Image, StyleSheet, ScrollView, Animated } from "react-native";
-import Navbar from "./Navbar"; // Importando a Navbar
+import Navbar from "../components/Navbar"; // Importando a Navbar
 
 const produtos = [
   { id: "1", nome: "Camiseta Branca", preco: "R$ 79,90", imagem: require("../../assets/images/Produtos/camisabranca.png") },
