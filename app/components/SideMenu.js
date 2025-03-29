@@ -1,9 +1,12 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { useRouter  } from "expo-router";
 
 const SideMenu = ({ isOpen, isMobile, toggleMenu }) => {
+
+    const router = useRouter();
+
     return (
         <View style={[styles.menu, isMobile && !isOpen ? styles.menuClosed : styles.menuOpen]}>
             {/* Logo */}
@@ -16,15 +19,15 @@ const SideMenu = ({ isOpen, isMobile, toggleMenu }) => {
                 </TouchableOpacity>
             )}
 
-            <Link href="/" style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={() => router.push("/dashboard")} >
                 <Ionicons name="speedometer" size={24} color="black" />
                 <Text style={styles.menuText}>Dashboard</Text>
-            </Link>
+            </TouchableOpacity>
 
-            <Link href="/screens/Products" style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem} onPress={() => router.push("/addProduct")}>
                 <Ionicons name="shirt" size={24} color="black" />
                 <Text style={styles.menuText}>Produtos</Text>
-            </Link>
+            </TouchableOpacity>
         </View>
     );
 };
