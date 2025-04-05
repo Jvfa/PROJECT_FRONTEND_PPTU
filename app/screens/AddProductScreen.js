@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity,
-  TextInput, Modal, Alert, FlatList
+  TextInput, Modal, Alert, FlatList, Platform 
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -135,34 +135,35 @@ const Products = () => {
 
   // Função corrigida para excluir produtos
   const excluirProduto = (id) => {
-    // Garantimos que o id seja tratado como string para comparação consistente
     const produtoId = String(id);
-    
-    Alert.alert(
-      "Confirmação",
-      "Tem certeza que deseja excluir este produto?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        { 
-          text: "Excluir", 
-          onPress: () => {
-            // Filtramos os produtos, removendo o que tem o ID correspondente
-            const novoProdutos = produtos.filter(produto => String(produto.id) !== produtoId);
-            setProdutos(novoProdutos);
-            
-            // Fecha o modal se estiver aberto e o produto selecionado for o excluído
-            if (modalVisible && selectedProduct && String(selectedProduct.id) === produtoId) {
-              setModalVisible(false);
-              setSelectedProduct(null);
-            }
-            
-            Alert.alert("Sucesso", "Produto excluído com sucesso!");
-          },
-          style: "destructive" 
-        }
-      ]
-    );
+  
+    const confirmarExclusao = () => {
+      const novoProdutos = produtos.filter(produto => String(produto.id) !== produtoId);
+      setProdutos(novoProdutos);
+  
+      if (modalVisible && selectedProduct && String(selectedProduct.id) === produtoId) {
+        setModalVisible(false);
+        setSelectedProduct(null);
+      }
+  
+      Alert.alert("Sucesso", "Produto excluído com sucesso!");
+    };
+  
+    if (Platform.OS === 'web') {
+      const confirmado = confirm("Tem certeza que deseja excluir este produto?");
+      if (confirmado) confirmarExclusao();
+    } else {
+      Alert.alert(
+        "Confirmação",
+        "Tem certeza que deseja excluir este produto?",
+        [
+          { text: "Cancelar", style: "cancel" },
+          { text: "Excluir", onPress: confirmarExclusao, style: "destructive" }
+        ]
+      );
+    }
   };
+  
 
   const verProduto = (produto) => {
     setSelectedProduct(produto);
