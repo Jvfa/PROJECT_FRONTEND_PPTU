@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity,
-  TextInput, Modal, Alert, FlatList, Platform 
+  TextInput, Modal, Alert, FlatList, Platform
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -93,32 +93,68 @@ const Products = () => {
     setCurrentId(null);
   };
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 3;
+
   const adicionarOuEditarProduto = () => {
-    // Validação básica
-    if (!formData.nome || !formData.preco) {
-      Alert.alert("Erro", "Por favor, preencha os campos obrigatórios (Nome e Preço)");
+    // Validações de campos específicos
+    if (!formData.nome.trim()) {
+      if (Platform.OS === 'web') {
+        alert("Por favor, preencha o campo Nome");
+      } else {
+        Alert.alert("Campo obrigatório", "Por favor, preencha o campo Nome");
+      }
+      return;
+    }
+
+    if (!formData.preco.trim()) {
+      if (Platform.OS === 'web') {
+        alert("Por favor, preencha o campo Preço");
+      } else {
+        Alert.alert("Campo obrigatório", "Por favor, preencha o campo Preço");
+      }
+      return;
+    }
+
+    // Validar se o preço é um número válido
+    if (isNaN(parseFloat(formData.preco)) || parseFloat(formData.preco) <= 0) {
+      if (Platform.OS === 'web') {
+        alert("Por favor, insira um valor válido para Preço");
+      } else {
+        Alert.alert("Valor inválido", "Por favor, insira um valor válido para Preço");
+      }
       return;
     }
 
     if (isEditing) {
       // Atualizar produto existente
-      const updatedProdutos = produtos.map(produto => 
-        produto.id === currentId ? {...formData, id: currentId} : produto
+      const updatedProdutos = produtos.map(produto =>
+        produto.id === currentId ? { ...formData, id: currentId } : produto
       );
       setProdutos(updatedProdutos);
-      Alert.alert("Sucesso", "Produto atualizado com sucesso!");
+
+      if (Platform.OS === 'web') {
+        alert("Produto atualizado com sucesso!");
+      } else {
+        Alert.alert("Sucesso", "Produto atualizado com sucesso!");
+      }
     } else {
       // Adicionar novo produto com ID automático
       const newProduct = {
         ...formData,
         id: nextId.toString()
       };
-      
+
       setProdutos([...produtos, newProduct]);
       setNextId(nextId + 1);
-      Alert.alert("Sucesso", "Produto adicionado com sucesso!");
+
+      if (Platform.OS === 'web') {
+        alert("Produto adicionado com sucesso!");
+      } else {
+        Alert.alert("Sucesso", "Produto adicionado com sucesso!");
+      }
     }
-    
+
     resetForm();
   };
 
@@ -136,19 +172,19 @@ const Products = () => {
   // Função corrigida para excluir produtos
   const excluirProduto = (id) => {
     const produtoId = String(id);
-  
+
     const confirmarExclusao = () => {
       const novoProdutos = produtos.filter(produto => String(produto.id) !== produtoId);
       setProdutos(novoProdutos);
-  
+
       if (modalVisible && selectedProduct && String(selectedProduct.id) === produtoId) {
         setModalVisible(false);
         setSelectedProduct(null);
       }
-  
+
       Alert.alert("Sucesso", "Produto excluído com sucesso!");
     };
-  
+
     if (Platform.OS === 'web') {
       const confirmado = confirm("Tem certeza que deseja excluir este produto?");
       if (confirmado) confirmarExclusao();
@@ -163,7 +199,7 @@ const Products = () => {
       );
     }
   };
-  
+
 
   const verProduto = (produto) => {
     setSelectedProduct(produto);
@@ -192,6 +228,30 @@ const Products = () => {
       preco: ''
     });
   };
+
+  // Cálculo de produtos para paginação
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = produtosFiltrados.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(produtosFiltrados.length / productsPerPage);
+
+  // Funções para navegação de páginas
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const goToPage = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
 
   return (
     <View style={styles.container}>
@@ -293,8 +353,8 @@ const Products = () => {
             </View>
 
             <View style={styles.buttonRow}>
-              <TouchableOpacity 
-                style={[styles.button, styles.submitButton]} 
+              <TouchableOpacity
+                style={[styles.button, styles.submitButton]}
                 onPress={adicionarOuEditarProduto}
               >
                 <Text style={styles.buttonText}>
@@ -303,8 +363,8 @@ const Products = () => {
               </TouchableOpacity>
 
               {isEditing && (
-                <TouchableOpacity 
-                  style={[styles.button, styles.cancelButton]} 
+                <TouchableOpacity
+                  style={[styles.button, styles.cancelButton]}
                   onPress={resetForm}
                 >
                   <Text style={styles.buttonText}>Cancelar</Text>
@@ -315,7 +375,7 @@ const Products = () => {
 
           {/* Área de filtros - sem campo ID */}
           <View style={styles.filtersContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.filterToggle}
               onPress={() => setMostrarFiltros(!mostrarFiltros)}
             >
@@ -384,8 +444,8 @@ const Products = () => {
 
                 <View style={styles.formRow}>
                   <View style={styles.formGroup}>
-                    <TouchableOpacity 
-                      style={[styles.button, styles.clearButton]} 
+                    <TouchableOpacity
+                      style={[styles.button, styles.clearButton]}
                       onPress={limparFiltros}
                     >
                       <Text style={styles.buttonText}>Limpar Filtros</Text>
@@ -404,61 +464,105 @@ const Products = () => {
             </Text>
 
             {produtosFiltrados.length > 0 ? (
-              produtosFiltrados.map((produto) => (
-                <View key={produto.id} style={styles.productCard}>
-                  <View style={styles.productInfo}>
-                    <View style={styles.productIconContainer}>
-                      <MaterialCommunityIcons 
-                        name={getIconeParaTipo(produto.tipo)} 
-                        size={32} 
-                        color="#444"
-                      />
-                    </View>
-                    
-                    <View style={styles.productDetails}>
-                      <Text style={styles.productId}>#{produto.id}</Text>
-                      <Text style={styles.productName}>{produto.nome}</Text>
-                      <View style={styles.productMetaRow}>
-                        <Text style={styles.productMeta}>
-                          {tiposProdutos.find(t => t.id === produto.tipo)?.nome || produto.tipo}
-                        </Text>
-                        <Text style={styles.productMetaSeparator}>•</Text>
-                        <Text style={styles.productMeta}>
-                          {coresProdutos.find(c => c.id === produto.cor)?.nome || produto.cor}
-                        </Text>
-                        <Text style={styles.productMetaSeparator}>•</Text>
-                        <Text style={styles.productPrice}>
-                          R$ {parseFloat(produto.preco).toFixed(2)}
-                        </Text>
+              <>
+                {currentProducts.map((produto) => (
+                  <View key={produto.id} style={styles.productCard}>
+                    {/* Mantém o código do card de produto como estava */}
+                    <View style={styles.productInfo}>
+                      <View style={styles.productIconContainer}>
+                        <MaterialCommunityIcons
+                          name={getIconeParaTipo(produto.tipo)}
+                          size={32}
+                          color="#444"
+                        />
+                      </View>
+
+                      <View style={styles.productDetails}>
+                        <Text style={styles.productId}>#{produto.id}</Text>
+                        <Text style={styles.productName}>{produto.nome}</Text>
+                        <View style={styles.productMetaRow}>
+                          <Text style={styles.productMeta}>
+                            {tiposProdutos.find(t => t.id === produto.tipo)?.nome || produto.tipo}
+                          </Text>
+                          <Text style={styles.productMetaSeparator}>•</Text>
+                          <Text style={styles.productMeta}>
+                            {coresProdutos.find(c => c.id === produto.cor)?.nome || produto.cor}
+                          </Text>
+                          <Text style={styles.productMetaSeparator}>•</Text>
+                          <Text style={styles.productPrice}>
+                            R$ {parseFloat(produto.preco).toFixed(2)}
+                          </Text>
+                        </View>
                       </View>
                     </View>
+
+                    <View style={styles.productActions}>
+                      <TouchableOpacity
+                        style={[styles.actionButton, styles.viewButton]}
+                        onPress={() => verProduto(produto)}
+                      >
+                        <Ionicons name="eye" size={20} color="white" />
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[styles.actionButton, styles.editButton]}
+                        onPress={() => editarProduto(produto.id)}
+                      >
+                        <Ionicons name="pencil" size={20} color="white" />
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[styles.actionButton, styles.deleteButton]}
+                        onPress={() => excluirProduto(produto.id)}
+                        activeOpacity={0.7}
+                      >
+                        <Ionicons name="trash" size={20} color="white" />
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                  
-                  <View style={styles.productActions}>
-                    <TouchableOpacity 
-                      style={[styles.actionButton, styles.viewButton]}
-                      onPress={() => verProduto(produto)}
-                    >
-                      <Ionicons name="eye" size={20} color="white" />
-                    </TouchableOpacity>
-                    
-                    <TouchableOpacity 
-                      style={[styles.actionButton, styles.editButton]}
-                      onPress={() => editarProduto(produto.id)}
-                    >
-                      <Ionicons name="pencil" size={20} color="white" />
-                    </TouchableOpacity>
-                    
-                    <TouchableOpacity 
-                      style={[styles.actionButton, styles.deleteButton]}
-                      onPress={() => excluirProduto(produto.id)}
-                      activeOpacity={0.7}
-                    >
-                      <Ionicons name="trash" size={20} color="white" />
-                    </TouchableOpacity>
+                ))}
+
+                {/* Controles de paginação */}
+                <View style={styles.paginationContainer}>
+                  <TouchableOpacity
+                    style={[styles.paginationButton, currentPage === 1 && styles.paginationButtonDisabled]}
+                    onPress={goToPreviousPage}
+                    disabled={currentPage === 1}
+                  >
+                    <Ionicons name="chevron-back" size={18} color={currentPage === 1 ? "#ccc" : "#333"} />
+                  </TouchableOpacity>
+
+                  <View style={styles.pageNumbers}>
+                    {Array.from({ length: totalPages }, (_, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={[
+                          styles.pageNumberButton,
+                          currentPage === index + 1 && styles.activePageButton
+                        ]}
+                        onPress={() => goToPage(index + 1)}
+                      >
+                        <Text
+                          style={[
+                            styles.pageNumberText,
+                            currentPage === index + 1 && styles.activePageText
+                          ]}
+                        >
+                          {index + 1}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
                   </View>
+
+                  <TouchableOpacity
+                    style={[styles.paginationButton, currentPage === totalPages && styles.paginationButtonDisabled]}
+                    onPress={goToNextPage}
+                    disabled={currentPage === totalPages}
+                  >
+                    <Ionicons name="chevron-forward" size={18} color={currentPage === totalPages ? "#ccc" : "#333"} />
+                  </TouchableOpacity>
                 </View>
-              ))
+              </>
             ) : (
               <Text style={styles.noProductsText}>
                 Nenhum produto encontrado. Adicione seu primeiro produto!
@@ -480,58 +584,58 @@ const Products = () => {
                 <>
                   <View style={styles.modalHeader}>
                     <Text style={styles.modalTitle}>Detalhes do Produto</Text>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={styles.closeButton}
                       onPress={() => setModalVisible(false)}
                     >
                       <Ionicons name="close" size={24} color="black" />
                     </TouchableOpacity>
                   </View>
-                  
+
                   <View style={styles.modalIconHeader}>
-                    <MaterialCommunityIcons 
-                      name={getIconeParaTipo(selectedProduct.tipo)} 
-                      size={48} 
+                    <MaterialCommunityIcons
+                      name={getIconeParaTipo(selectedProduct.tipo)}
+                      size={48}
                       color="#444"
                     />
                     <Text style={styles.modalProductName}>{selectedProduct.nome}</Text>
                   </View>
-                  
+
                   <View style={styles.detailRow}>
                     <Text style={styles.detailLabel}>ID:</Text>
                     <Text style={styles.detailValue}>{selectedProduct.id}</Text>
                   </View>
-                  
+
                   <View style={styles.detailRow}>
                     <Text style={styles.detailLabel}>Tipo:</Text>
                     <Text style={styles.detailValue}>
                       {tiposProdutos.find(t => t.id === selectedProduct.tipo)?.nome || selectedProduct.tipo}
                     </Text>
                   </View>
-                  
+
                   <View style={styles.detailRow}>
                     <Text style={styles.detailLabel}>Cor:</Text>
                     <Text style={styles.detailValue}>
                       {coresProdutos.find(c => c.id === selectedProduct.cor)?.nome || selectedProduct.cor}
                     </Text>
                   </View>
-                  
+
                   <View style={styles.detailRow}>
                     <Text style={styles.detailLabel}>Preço:</Text>
                     <Text style={styles.detailValue}>
                       R$ {parseFloat(selectedProduct.preco).toFixed(2)}
                     </Text>
                   </View>
-                  
+
                   <View style={styles.characteristicsContainer}>
                     <Text style={styles.detailLabel}>Características:</Text>
                     <Text style={styles.characteristicsText}>
                       {selectedProduct.caracteristicas || "Nenhuma característica especificada"}
                     </Text>
                   </View>
-                  
+
                   <View style={styles.modalActions}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={[styles.modalButton, styles.editButton]}
                       onPress={() => {
                         setModalVisible(false);
@@ -540,8 +644,8 @@ const Products = () => {
                     >
                       <Text style={styles.modalButtonText}>Editar</Text>
                     </TouchableOpacity>
-                    
-                    <TouchableOpacity 
+
+                    <TouchableOpacity
                       style={[styles.modalButton, styles.deleteButton]}
                       onPress={() => {
                         setModalVisible(false);
@@ -550,8 +654,8 @@ const Products = () => {
                     >
                       <Text style={styles.modalButtonText}>Excluir</Text>
                     </TouchableOpacity>
-                    
-                    <TouchableOpacity 
+
+                    <TouchableOpacity
                       style={[styles.modalButton, styles.closeModalButton]}
                       onPress={() => setModalVisible(false)}
                     >
@@ -918,7 +1022,56 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  // Estilos para paginação
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  paginationButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  paginationButtonDisabled: {
+    backgroundColor: '#f9f9f9',
+    opacity: 0.5,
+  },
+  pageNumbers: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 10,
+  },
+  pageNumberButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 3,
+  },
+  activePageButton: {
+    backgroundColor: '#3f51b5',
+  },
+  pageNumberText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  activePageText: {
+    color: 'white',
+    fontWeight: 'bold',
   }
+
 });
 
 export default Products;
