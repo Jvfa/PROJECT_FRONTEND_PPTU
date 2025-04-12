@@ -8,18 +8,21 @@
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/images/splash.png",
-      "resizeMode": "contain ",
+      "resizeMode": "contain",
       "backgroundColor": "#F8F9FA"
     },
     "newArchEnabled": true,
+    "scheme": "meuAppSmooth",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.meuAppSmooth.ios"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.meuAppSmooth.android"
     },
     "web": {
       "bundler": "metro",
